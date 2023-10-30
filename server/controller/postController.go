@@ -94,6 +94,7 @@ func GetAPost(r *gin.Context) {
 			"message": "Fail to get post",
 			"error":   err.Error(),
 		})
+		return
 	}
 
 	r.JSON(http.StatusOK, gin.H{

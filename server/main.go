@@ -7,6 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
+    "github.com/gin-contrib/cors"
 )
 
 func main() {
@@ -14,7 +15,10 @@ func main() {
 	models.Conn_DB()
 
 	r := gin.Default()
-	
+	config := cors.DefaultConfig()
+    config.AllowOrigins = []string{"*"} // Cho phép truy cập từ tất cả các nguồn
+    config.AllowMethods = []string{"GET", "POST", "PUT", "DELETE"}
+    r.Use(cors.New(config))
 	v1 := r.Group("/v1")
 	{
 		user := v1.Group("/users")
