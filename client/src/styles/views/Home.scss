@@ -1,0 +1,23 @@
+@import "../Base.scss";
+.home{
+    width: 100%;
+    height:fit-content;
+    min-height:100vh;
+    background-color: transparent;
+    &-user{
+        display: flex;
+        align-items: center;
+        background-color: $white-color;
+        &-posting{
+            height:35px;
+            width:300px;
+            text-align: left;
+            background-color: transparent;
+            border-radius: 17.5px;
+            padding: 0 10px;
+            border: 1.5px solid rgba(128, 128, 128, 0.685);
+            color: rgba(128, 128, 128, 0.685);
+
+        }
+    }
+}

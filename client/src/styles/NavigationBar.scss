@@ -1,0 +1,18 @@
+@import "Base.scss";
+.navigationBar{
+    background-color: $white-color;
+    display: flex;
+    height:100vh;
+    width:fit-content;
+    padding:10px;
+    padding-top:30px; 
+    justify-content: flex-start; 
+    flex-direction: column;
+    border-radius: 5px;   
+    margin-right: 4px;
+    &-item{
+        color: black;
+        display: block;
+        margin-bottom: 20px;
+    }
+}

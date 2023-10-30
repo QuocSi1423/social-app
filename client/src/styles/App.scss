@@ -1,0 +1,26 @@
+*{
+    margin: 0;
+    padding:0;
+    box-sizing: border-box;
+    text-decoration: none;
+    color:black;
+}
+body{
+    background-color: rgb(239, 239, 239);
+    display: flex;
+    justify-content: center;
+    a{
+        text-decoration: none;
+    }
+}
+.app{
+    background-color: transparent;
+    max-width:960px;
+    width:620px;
+    display: flex;
+}
+
+.tag{
+    padding:15px 20px; 
+    border-radius: 10px;
+}
