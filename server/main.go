@@ -13,7 +13,7 @@ import (
 func main() {
 	godotenv.Load()
 	models.Conn_DB()
-
+	
 	r := gin.Default()
 	config := cors.DefaultConfig()
     config.AllowOrigins = []string{"*"} // Cho phép truy cập từ tất cả các nguồn

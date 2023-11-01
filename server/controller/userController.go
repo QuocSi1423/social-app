@@ -107,7 +107,6 @@ func Login(r *gin.Context) {
 	r.JSON(http.StatusAccepted, gin.H{
 		"message": "success",
 		"data":    dbData,
-		"token":   tokenStr,
 	})
 
 }

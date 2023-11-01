@@ -25,5 +25,5 @@ func VerifyPostOwn(r *gin.Context) {
 		return
 	}
 
-	defer r.Next()
+	r.Next()
 }
