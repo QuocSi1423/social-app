@@ -1,9 +1,12 @@
 @import "../Base.scss";
 .home{
     width: 100%;
-    height:fit-content;
+    height:100vh;
     min-height:100vh;
     background-color: transparent;
+    overflow-y: scroll;
+    overflow-x: hidden;
+
     &-user{
         display: flex;
         align-items: center;
@@ -19,5 +22,27 @@
             color: rgba(128, 128, 128, 0.685);
 
         }
+    }
+    &-switch{
+        width:100%;
+        height:fit-content;
+        display: flex;
+        justify-content: space-between;
+        border-radius: 7px;
+        overflow: hidden;
+        margin-bottom: 3px;
+        button{
+            width:50%;
+            padding:5px 0;
+            font-size: 20px;
+            font-weight: 700;
+            background-color: $white-color;
+            border: 0;
+
+        }
+    }
+    &-posts{
+        width:100%;
+        height:100%;
     }
 }

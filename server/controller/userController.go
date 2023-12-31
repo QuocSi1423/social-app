@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"os"
 
+	"gorm.io/gorm"
+
 	// "os"
 	"time"
 
@@ -23,6 +25,40 @@ func Register(r *gin.Context) {
 		})
 		return
 	}
+	emailExist := false
+	nameExist := false
+	if err := models.DB.Where("email = ?", user.Email).First(&models.User{}).Error; err != nil {
+		if err != gorm.ErrRecordNotFound {
+			r.JSON(http.StatusInternalServerError, gin.H{
+				"message": "error",
+				"error":   err.Error(),
+			})
+			return
+		}
+	} else {
+		emailExist = true
+	}
+
+	if err := models.DB.Where("id = ?", user.Id).First(&models.User{}).Error; err != nil {
+		if err != gorm.ErrRecordNotFound {
+			r.JSON(http.StatusInternalServerError, gin.H{
+				"message": "error",
+				"error":   err.Error(),
+			})
+			return
+		}
+	} else {
+		nameExist = true
+	}
+
+	if emailExist || nameExist {
+		r.JSON(http.StatusConflict, gin.H{
+			"emailExist": emailExist,
+			"nameExist":  nameExist,
+		})
+		return
+	}
+
 	cost := bcrypt.DefaultCost
 	hashPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), cost)
 	user.Password = string(hashPassword)
@@ -63,7 +99,8 @@ func Login(r *gin.Context) {
 	dbData := models.User{}
 
 	if err := models.DB.Where("id = ?", clientData.Id).First(&dbData).Error; err != nil {
-		if err.Error() == "record not found" {
+		
+		if err == gorm.ErrRecordNotFound {
 			r.JSON(http.StatusUnauthorized, gin.H{
 				"message": "Unauthorized",
 				"error":   err.Error(),
@@ -84,6 +121,7 @@ func Login(r *gin.Context) {
 		})
 		return
 	}
+
 	t := time.Now().Add(time.Hour)
 	fmt.Println(t)
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
@@ -101,12 +139,13 @@ func Login(r *gin.Context) {
 		return
 	}
 
-	r.SetSameSite(http.SameSiteLaxMode)
-	r.SetCookie("accessToken", tokenStr, 3600, "", "", false, true)
-
+	r.SetSameSite(http.SameSiteNoneMode)
+	r.SetCookie("access_token", tokenStr, 3600, "/", "localhost", true, false)
 	r.JSON(http.StatusAccepted, gin.H{
 		"message": "success",
 		"data":    dbData,
+		"token":   tokenStr,
 	})
 
 }
+

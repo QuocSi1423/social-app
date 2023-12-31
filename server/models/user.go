@@ -10,6 +10,10 @@ type User struct {
 	UpdateAt time.Time `json:"update_at" gorm:"update_at"`
 }
 
+type UserCheckLoginName struct{
+	Id string `json:"id"`
+}
+
 type RegisterUser struct {
 	Id       string `json:"id" gorm:"id"`
 	Email    string `json:"email" gorm:"email"`

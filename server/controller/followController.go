@@ -13,7 +13,7 @@ import (
 func Follow(r *gin.Context) {
 
 	follow := models.Follow{}
-	follow.FollowerId = r.Param("id")
+	follow.FollowerId = r.MustGet("id").(string)
 	follow.UserId = r.Query("user_id")
 	follow.CreateAt = time.Now()
 	if follow.FollowerId == "" || follow.UserId == "" {
@@ -70,7 +70,7 @@ func Follow(r *gin.Context) {
 }
 
 func UnFollow(r *gin.Context) {
-	followerId := r.Param("id")
+	followerId := r.MustGet("id")
 	userId := r.Query("user_id")
 
 	tx := models.DB.Begin()

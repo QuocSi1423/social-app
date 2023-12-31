@@ -12,8 +12,8 @@ import (
 func CreateInteract(r *gin.Context) {
 	interact := models.Interact{}
 
-	interact.PostId = r.Query("post_id")
-	interact.UserId = r.Param("id")
+	interact.PostId = r.Param("post_id")
+	interact.UserId = r.MustGet("id").(string)
 	interact.CreateAt = time.Now()
 
 	tx := models.DB.Begin()
@@ -28,6 +28,7 @@ func CreateInteract(r *gin.Context) {
 		})
 		return
 	}
+	
 	if updatePost.RowsAffected == 0 {
 		tx.Rollback()
 		r.JSON(http.StatusNotFound, gin.H{
@@ -54,8 +55,8 @@ func CreateInteract(r *gin.Context) {
 func DeleteInteract(r *gin.Context) {
 	interact := models.Interact{}
 
-	interact.PostId = r.Query("post_id")
-	interact.UserId = r.Param("id")
+	interact.PostId = r.Param("post_id")
+	interact.UserId = r.MustGet("id").(string)
 	tx := models.DB.Begin()
 
 	//delete interact
@@ -93,4 +94,3 @@ func DeleteInteract(r *gin.Context) {
 	})
 
 }
-

@@ -8,11 +8,12 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 func InitUserInformation(r *gin.Context) {
 	userInfoInit := models.InitUserInformation{}
-	userInfoInit.Id = r.Param("id")
+	userInfoInit.Id = r.MustGet("id").(string)
 	if err := r.ShouldBind(&userInfoInit); err != nil {
 		r.JSON(http.StatusBadRequest, gin.H{
 			"message": "error",
@@ -21,14 +22,14 @@ func InitUserInformation(r *gin.Context) {
 		return
 	}
 	userInfo := models.UserInformation{
-		Id: userInfoInit.Id,
-		UserName: userInfoInit.UserName,
-		Birthday: userInfoInit.Birthday,
+		Id:             userInfoInit.Id,
+		UserName:       userInfoInit.UserName,
+		Birthday:       userInfoInit.Birthday,
 		AvatarImageUrl: userInfoInit.AvatarImageUrl,
-		Followers: 0,
-		Followings: 0,
-		Friends: 0,
-		UpdateAt: time.Now(),
+		Followers:      0,
+		Followings:     0,
+		Friends:        0,
+		UpdateAt:       time.Now(),
 	}
 	if err := models.DB.Save(userInfo).Error; err != nil {
 		r.JSON(http.StatusInternalServerError, gin.H{
@@ -39,7 +40,7 @@ func InitUserInformation(r *gin.Context) {
 	}
 
 	r.JSON(http.StatusOK, gin.H{
-		"message": "success",
+		"message":   "success",
 		"user_info": userInfo,
 	})
 
@@ -47,7 +48,7 @@ func InitUserInformation(r *gin.Context) {
 
 func UpdateUserInformation(r *gin.Context) {
 	userInfo := models.UpdateUserInformation{}
-	userId := r.Param("id")
+	userId := r.MustGet("id")
 	if err := r.ShouldBind(&userInfo); err != nil {
 		r.JSON(http.StatusBadRequest, gin.H{
 			"message": "error",
@@ -72,6 +73,7 @@ func UpdateUserInformation(r *gin.Context) {
 
 func GetUserInformation(r *gin.Context) {
 	userId := r.Param("id")
+
 	field := r.Query("field")
 	if field == "" {
 		field = "user_name id birthday avatar_image_url create_at update_at followers followings"
@@ -81,13 +83,20 @@ func GetUserInformation(r *gin.Context) {
 	user := models.UserInformation{}
 
 	if err := models.DB.Select(fields).Where("id = ?", userId).Find(&user).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			r.JSON(http.StatusInternalServerError, gin.H{
+				"message": "No User Found",
+				"error":   err.Error(),
+			})
+			return
+		}
+
 		r.JSON(http.StatusInternalServerError, gin.H{
 			"message": "error",
 			"error":   err.Error(),
 		})
 		return
 	}
-
 	r.JSON(http.StatusOK, gin.H{
 		"data": user,
 	})
@@ -97,7 +106,7 @@ func GetUserInformation(r *gin.Context) {
 func GetBriefUserInformation(r *gin.Context) {
 	userId := r.Param("id")
 	field := "id user_name avatar_image_url"
-	
+
 	fields := strings.Split(field, " ")
 
 	user := models.BriefUserInformation{}
@@ -116,14 +125,10 @@ func GetBriefUserInformation(r *gin.Context) {
 
 }
 
-
-
 func GetFollowersInformation(r *gin.Context) {
 	users := []models.BriefUserInformation{}
 	userId := r.Param("id")
 	paging := common.Paging{}
-
-	
 
 	if err := common.GetPaging(&paging, r); err != nil {
 		r.JSON(http.StatusBadRequest, gin.H{
@@ -142,8 +147,8 @@ func GetFollowersInformation(r *gin.Context) {
 	}
 
 	r.JSON(http.StatusOK, gin.H{
-		"data": users,
-		"page": paging.Page,
+		"data":  users,
+		"page":  paging.Page,
 		"limit": paging.Limit,
 	})
 }

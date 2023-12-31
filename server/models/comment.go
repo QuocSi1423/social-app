@@ -27,4 +27,3 @@ func (c *Comment) TableName() string {
 func (c *CommentUpdate) TableName() string {
 	return "comments"
 }
-

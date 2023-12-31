@@ -1,6 +1,6 @@
 import axios from "axios";
 
-export const getBriefUserInformation = () =>
+export const getBriefUserInformation = (userId) =>
 {
-    axios.get("")
+    return axios.get(`http://localhost:5173/v1/users/${userId}/informations/brief`)
 }

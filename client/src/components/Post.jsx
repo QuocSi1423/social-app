@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import {BiSolidHeart, BiHeart, BiCommentDetail} from "react-icons/bi"
+import {BiSolidHeart, BiHeart, BiCommentDetail, BiSolidSend} from "react-icons/bi"
 import BriefUserInformation from "./BriefUserInformation";
 import { getBriefUserInformation } from "../service/service-user";
+import { checkInteractOfPost, getAPost, likeHandler } from "../service/service-post";
+import { getCookie } from "../common";
 const Post = (props) =>
 {
     function formatRelativeTime(datetimeString) {
@@ -40,19 +42,47 @@ const Post = (props) =>
     }
 
 
-    const { post } = props;
+    const { postId } = props;
+    const [ post, setPost ] = useState( {} );
     const [ interacted, setInteracted ] = useState( false );
     const [ user, setUser ] = useState( {} );
+    const [ commentDisplay, setCommentDisplay ] = useState( false );
+    const [ comment, setComment ] = useState( "" );
 
     useEffect( () =>
     {
-        getBriefUserInformation( post.user_id ).then( ( result ) =>
+        getAPost( postId ).then( result =>
         {
-            setUser( result.data.data );
-        })
-    }, [] )
+            setPost( result.data.data );
+            getBriefUserInformation( result.data.data.user_id ).then( ( result ) =>
+            {
+                setUser( result.data.data );
+            })
+        } )
+        checkInteractOfPost( postId, getCookie("accessToken") ).then( result =>{
+            
+                setInteracted(true)
+            } )
+            .catch( (err) =>
+            {
+                
+            })
+            
+        }, [] )
     const interactHandle = () =>
     {
+        let interactChange = !interacted ? 1 : -1;
+        if ( !interacted )
+        {
+            likeHandler( postId ).then( r =>
+            {
+                console.log(r)
+            } ).catch( err =>
+            {
+                console.log(err)
+            })
+        }
+        setPost( { ...post, count_interact: post.count_interact + interactChange } );
         setInteracted( !interacted );
     }
     return (
@@ -73,8 +103,20 @@ const Post = (props) =>
                     }
                     { post.count_interact }
                 </button>
-                <button><BiCommentDetail size="30" />{post.count_comment}</button>
+                <button><BiCommentDetail size="30" onClick={()=>setCommentDisplay(true)} />{post.count_comment}</button>
             </div>
+            {
+                commentDisplay ?
+                <div className="post-comment">
+                    <input type="text" value={comment} placeholder="Comment..." onChange={(e)=>setComment(e.target.value)} />
+                    <button className="post-comment-send" >
+                        <BiSolidSend size={30}/>
+                    </button>
+                </div>
+                :
+                <></>
+            }
+            
             
         </div>
     )

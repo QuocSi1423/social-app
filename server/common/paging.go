@@ -25,14 +25,18 @@ func GetPagingItem(s string, r *gin.Context, _default int) (int, error){
 	}
 }
 
-func GetPaging(p *Paging, r *gin.Context) error{
+func (p *Paging)GetPaging(r *gin.Context) error{
 	var err error
 
 	p.Page, err = GetPagingItem("page", r, 1)
-	p.Limit, err = GetPagingItem("limit", r, 10)
-
-	if err!=nil{
+	if err != nil{
 		return err
 	}
+
+	p.Limit, err = GetPagingItem("limit", r, 10)
+	if err != nil{
+		return err
+	}
+	
 	return nil
 }

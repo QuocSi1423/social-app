@@ -3,6 +3,7 @@ package middleware
 import (
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -11,14 +12,14 @@ import (
 
 func VerifyJWT(r *gin.Context) {
 
-	if r.GetHeader("token") == "" {
+	auth := r.GetHeader("Authorization")
+	if auth == "" {
 		r.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
-			"message": "You'r not authenticated",
+			"message": "there is no token",
 		})
 		return
 	}
-
-	tokenStr := r.GetHeader("token")
+	tokenStr := strings.TrimPrefix(auth, "Bearer ")
 	token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
 		return []byte(os.Getenv("SECRET_KEY")), nil
 	})
@@ -33,15 +34,13 @@ func VerifyJWT(r *gin.Context) {
 	claims := token.Claims.(jwt.MapClaims)
 	id := claims["id"]
 	r.Set("id", id)
-	if time.Unix(int64(claims["expired"].(float64)),0).Before(time.Now()){
+	if time.Unix(int64(claims["expired"].(float64)), 0).Before(time.Now()) {
 		r.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 			"message": "Token has expired",
 		})
 		return
 	}
 	r.Next()
-
-
 }
 
 func VerifyIdentity(r *gin.Context) {

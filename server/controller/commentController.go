@@ -163,7 +163,7 @@ func GetCommentsOfPost(r *gin.Context) {
 		return
 	}
 
-	comments := []models.Comment{}
+	/*comments := []models.Comment{}
 
 	if err := models.DB.Where("post_id = ?", r.Param("id")).Limit(paging.Limit).Offset((paging.Page - 1) * paging.Limit).Find(&comments).Error; err != nil {
 		r.JSON(http.StatusInternalServerError, gin.H{
@@ -176,6 +176,32 @@ func GetCommentsOfPost(r *gin.Context) {
 	r.JSON(http.StatusOK, gin.H{
 		"data":  comments,
 		"limit": paging.Limit,
+		"page":  paging.Page, 
+	})*/
+	type CommentWithUser struct {
+		models.BriefUserInformation
+		models.Comment
+	}
+	comments := []CommentWithUser{}
+	if err := models.DB.Select("comments.id, comments.content, comments.image_url, comments.create_at, user_informations.id, user_informations.user_name, user_informations.avatar_image_url").Table("comments").InnerJoins("Join user_informations on comments.user_id = user_informations.id").Where("comments.post_id = ?", r.Param("id")).Find(&comments).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			r.JSON(http.StatusNotFound, gin.H{
+				"message": "No Post Found",
+				"error":   err.Error(),
+			})
+			return
+		}
+		r.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Fail to load comments",
+			"error":   err.Error,
+		})
+		return
+	}
+
+	r.JSON(http.StatusOK, gin.H{
+		"data":  comments,
+		"limit": paging.Limit,
 		"page":  paging.Page,
 	})
+
 }

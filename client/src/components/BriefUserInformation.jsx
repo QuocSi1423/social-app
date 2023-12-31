@@ -4,12 +4,13 @@ import { Link } from "react-router-dom";
 
 const BriefUserInformation = (props) =>
 {
-    const { avatarUrl, username } = props;
+    
+    const { avatarUrl, username, avatarSize, nameSize } = props;
     return (
         <div className="briefUserInformation">
             <Link>
-                <img className="briefUserInformation-image" src={ avatarUrl } alt="" />
-                <span className="briefUserInformation-name">{username}</span>
+                <img style={ avatarSize ? { width: `${ avatarSize }px`,height:`${avatarSize}px`}:{}} className="briefUserInformation-image" src={ avatarUrl } alt="" />
+                <span style={ nameSize ? {fontSize:`${nameSize}px`}:{}} className="briefUserInformation-name">{username}</span>
             </Link>
         </div>
     )

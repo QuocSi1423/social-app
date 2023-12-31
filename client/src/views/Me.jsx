@@ -1,10 +1,11 @@
-import React from "react";  
-
+import React, { useEffect, useState } from "react";  
+import "../styles/views/Me.scss"
 
 const Me = () =>
 {
+    
     return (
-        <div>me</div>
+       <div>me</div>
     )
 }
 
